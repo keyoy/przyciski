@@ -7,9 +7,9 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@700&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+    <!-- Firebase SDK dla przeglądarki (w wersji 8.x.x) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <style>
         body {
@@ -62,18 +62,19 @@
     <button class="reset-button" onclick="resetAll()">Reset</button>
 
     <script>
-        // Konfiguracja Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBz8dv3Fl4bBaxllSb_CzsSLBaKnSyxXU4",
+        document.addEventListener("DOMContentLoaded", function() {
+            // Konfiguracja Firebase
+            const firebaseConfig = {
+                  apiKey: "AIzaSyBz8dv3Fl4bBaxllSb_CzsSLBaKnSyxXU4",
   authDomain: "przyciski.firebaseapp.com",
   projectId: "przyciski",
   storageBucket: "przyciski.appspot.com",
   messagingSenderId: "25037736651",
   appId: "1:25037736651:web:90fd96fd0ca9ec67ff694e"
-        };
+            };
 
-                 // Inicjalizacja Firebase
-            const app = firebase.initializeApp(firebaseConfig);
+            // Inicjalizacja Firebase
+            firebase.initializeApp(firebaseConfig);
             const db = firebase.firestore();
             const countersRef = db.collection('counters').doc('mainCounters');
 
@@ -89,7 +90,8 @@
                 }
             });
 
-            function updateCounter(index, action) {
+            // Definiowanie funkcji globalnie
+            window.updateCounter = function(index, action) {
                 countersRef.get().then((doc) => {
                     if (doc.exists) {
                         let counters = doc.data();
@@ -101,18 +103,15 @@
                         countersRef.set(counters);
                     }
                 });
-            }
+            };
 
-            function resetAll() {
+            window.resetAll = function() {
                 countersRef.set({
                     counter1: 0,
                     counter2: 0,
                     counter3: 0
                 });
-            }
-
-            window.updateCounter = updateCounter;
-            window.resetAll = resetAll;
+            };
         });
     </script>
 </body>
