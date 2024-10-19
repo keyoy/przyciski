@@ -25,7 +25,6 @@
             font-size: 60px;
             font-weight: bold;
             margin: 10px;
-            transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1), color 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
         button {
             font-size: 1em;
@@ -36,10 +35,6 @@
             margin-top: 30px;
             padding: 15px 30px;
             font-size: 1.2em;
-        }
-        .animate {
-            transform: scale(1.2);
-            color: #FFD700; /* Złoto-żółty kolor */
         }
     </style>
 </head>
@@ -70,12 +65,12 @@
         document.addEventListener("DOMContentLoaded", function() {
             // Konfiguracja Firebase
             const firebaseConfig = {
-                apiKey: "AIzaSyBz8dv3Fl4bBaxllSb_CzsSLBaKnSyxXU4",
-                authDomain: "przyciski.firebaseapp.com",
-                projectId: "przyciski",
-                storageBucket: "przyciski.appspot.com",
-                messagingSenderId: "25037736651",
-                appId: "1:25037736651:web:90fd96fd0ca9ec67ff694e"
+                  apiKey: "AIzaSyBz8dv3Fl4bBaxllSb_CzsSLBaKnSyxXU4",
+  authDomain: "przyciski.firebaseapp.com",
+  projectId: "przyciski",
+  storageBucket: "przyciski.appspot.com",
+  messagingSenderId: "25037736651",
+  appId: "1:25037736651:web:90fd96fd0ca9ec67ff694e"
             };
 
             // Inicjalizacja Firebase
@@ -95,30 +90,17 @@
                 }
             });
 
-            // Funkcja do animacji konkretnego licznika
-            function animateCounter(index) {
-                const counterElem = document.getElementById(`counter${index}`);
-                counterElem.classList.add('animate');
-
-                // Usunięcie animacji po 0.3s
-                setTimeout(() => {
-                    counterElem.classList.remove('animate');
-                }, 300);
-            }
-
-            // Funkcja aktualizacji licznika i wywołania animacji
+            // Definiowanie funkcji globalnie
             window.updateCounter = function(index, action) {
                 countersRef.get().then((doc) => {
                     if (doc.exists) {
                         let counters = doc.data();
                         if (action === 'increment') {
-                            counters[`counter${index}`] += 10;
+                            counters[counter${index}] += 10;
                         } else if (action === 'decrement') {
-                            counters[`counter${index}`] -= 10;
+                            counters[counter${index}] -= 10;
                         }
-                        countersRef.set(counters).then(() => {
-                            animateCounter(index); // Animacja po zaktualizowaniu
-                        });
+                        countersRef.set(counters);
                     }
                 });
             };
