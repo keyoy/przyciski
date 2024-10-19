@@ -25,6 +25,7 @@
             font-size: 60px;
             font-weight: bold;
             margin: 10px;
+            transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
         }
         button {
             font-size: 1em;
@@ -35,6 +36,10 @@
             margin-top: 30px;
             padding: 15px 30px;
             font-size: 1.2em;
+        }
+        .animate {
+            transform: scale(1.2);
+            color: #ff5722;
         }
     </style>
 </head>
@@ -66,11 +71,11 @@
             // Konfiguracja Firebase
             const firebaseConfig = {
                   apiKey: "AIzaSyBz8dv3Fl4bBaxllSb_CzsSLBaKnSyxXU4",
-  authDomain: "przyciski.firebaseapp.com",
-  projectId: "przyciski",
-  storageBucket: "przyciski.appspot.com",
-  messagingSenderId: "25037736651",
-  appId: "1:25037736651:web:90fd96fd0ca9ec67ff694e"
+                  authDomain: "przyciski.firebaseapp.com",
+                  projectId: "przyciski",
+                  storageBucket: "przyciski.appspot.com",
+                  messagingSenderId: "25037736651",
+                  appId: "1:25037736651:web:90fd96fd0ca9ec67ff694e"
             };
 
             // Inicjalizacja Firebase
@@ -82,23 +87,32 @@
             countersRef.onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
-                    document.getElementById('counter1').innerText = data.counter1;
-                    document.getElementById('counter2').innerText = data.counter2;
-                    document.getElementById('counter3').innerText = data.counter3;
+                    animateCounter('counter1', data.counter1);
+                    animateCounter('counter2', data.counter2);
+                    animateCounter('counter3', data.counter3);
                 } else {
                     console.log("Brak danych");
                 }
             });
 
-            // Definiowanie funkcji globalnie
+            // Funkcja aktualizacji licznika i animacja
+            function animateCounter(counterId, newValue) {
+                const counterElem = document.getElementById(counterId);
+                counterElem.classList.add('animate');
+                setTimeout(() => {
+                    counterElem.classList.remove('animate');
+                    counterElem.innerText = newValue;
+                }, 200); // 200ms to czas trwania animacji
+            }
+
             window.updateCounter = function(index, action) {
                 countersRef.get().then((doc) => {
                     if (doc.exists) {
                         let counters = doc.data();
                         if (action === 'increment') {
-                            counters[counter${index}] += 10;
+                            counters[`counter${index}`] += 10;
                         } else if (action === 'decrement') {
-                            counters[counter${index}] -= 10;
+                            counters[`counter${index}`] -= 10;
                         }
                         countersRef.set(counters);
                     }
