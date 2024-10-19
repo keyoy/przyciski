@@ -39,7 +39,7 @@
         }
         .animate {
             transform: scale(1.2);
-            color: #ff5722;
+            color: #FFD700; /* Złoto-żółty kolor */
         }
     </style>
 </head>
@@ -87,35 +87,26 @@
             countersRef.onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
-                    animateCounter(1, data.counter1);
-                    animateCounter(2, data.counter2);
-                    animateCounter(3, data.counter3);
+                    document.getElementById('counter1').innerText = data.counter1;
+                    document.getElementById('counter2').innerText = data.counter2;
+                    document.getElementById('counter3').innerText = data.counter3;
                 } else {
                     console.log("Brak danych");
                 }
             });
 
-            // Funkcja do animacji konkretnego licznika z użyciem wolniejszej animacji i cubic-bezier
-            function animateCounter(index, endValue) {
+            // Funkcja do animacji konkretnego licznika
+            function animateCounter(index) {
                 const counterElem = document.getElementById(`counter${index}`);
-                let startValue = parseInt(counterElem.innerText);
-                const duration = 6000; // czas trwania animacji w ms (wydłużony 3x)
-                const increment = (endValue - startValue) / (duration / 50); // wyliczanie przyrostu
+                counterElem.classList.add('animate');
 
-                function updateValue() {
-                    startValue += increment;
-                    if ((increment > 0 && startValue >= endValue) || (increment < 0 && startValue <= endValue)) {
-                        counterElem.innerText = endValue;
-                    } else {
-                        counterElem.innerText = Math.floor(startValue);
-                        requestAnimationFrame(updateValue); // płynna animacja
-                    }
-                }
-
-                updateValue();
+                // Usunięcie animacji po 0.3s
+                setTimeout(() => {
+                    counterElem.classList.remove('animate');
+                }, 300);
             }
 
-            // Funkcja aktualizacji licznika
+            // Funkcja aktualizacji licznika i wywołania animacji
             window.updateCounter = function(index, action) {
                 countersRef.get().then((doc) => {
                     if (doc.exists) {
@@ -125,7 +116,9 @@
                         } else if (action === 'decrement') {
                             counters[`counter${index}`] -= 10;
                         }
-                        countersRef.set(counters);
+                        countersRef.set(counters).then(() => {
+                            animateCounter(index); // Animacja po zaktualizowaniu
+                        });
                     }
                 });
             };
