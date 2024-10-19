@@ -25,7 +25,7 @@
             font-size: 60px;
             font-weight: bold;
             margin: 10px;
-            transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+            transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1), color 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
         button {
             font-size: 1em;
@@ -39,7 +39,7 @@
         }
         .animate {
             transform: scale(1.2);
-            color: #ff5722;
+            color: #FFD700; /* Złoto-żółty kolor */
         }
     </style>
 </head>
@@ -70,12 +70,12 @@
         document.addEventListener("DOMContentLoaded", function() {
             // Konfiguracja Firebase
             const firebaseConfig = {
-                  apiKey: "AIzaSyBz8dv3Fl4bBaxllSb_CzsSLBaKnSyxXU4",
-                  authDomain: "przyciski.firebaseapp.com",
-                  projectId: "przyciski",
-                  storageBucket: "przyciski.appspot.com",
-                  messagingSenderId: "25037736651",
-                  appId: "1:25037736651:web:90fd96fd0ca9ec67ff694e"
+                apiKey: "AIzaSyBz8dv3Fl4bBaxllSb_CzsSLBaKnSyxXU4",
+                authDomain: "przyciski.firebaseapp.com",
+                projectId: "przyciski",
+                storageBucket: "przyciski.appspot.com",
+                messagingSenderId: "25037736651",
+                appId: "1:25037736651:web:90fd96fd0ca9ec67ff694e"
             };
 
             // Inicjalizacja Firebase
@@ -87,24 +87,26 @@
             countersRef.onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
-                    animateCounter('counter1', data.counter1);
-                    animateCounter('counter2', data.counter2);
-                    animateCounter('counter3', data.counter3);
+                    document.getElementById('counter1').innerText = data.counter1;
+                    document.getElementById('counter2').innerText = data.counter2;
+                    document.getElementById('counter3').innerText = data.counter3;
                 } else {
                     console.log("Brak danych");
                 }
             });
 
-            // Funkcja aktualizacji licznika i animacja
-            function animateCounter(counterId, newValue) {
-                const counterElem = document.getElementById(counterId);
+            // Funkcja do animacji konkretnego licznika
+            function animateCounter(index) {
+                const counterElem = document.getElementById(`counter${index}`);
                 counterElem.classList.add('animate');
+
+                // Usunięcie animacji po 0.3s
                 setTimeout(() => {
                     counterElem.classList.remove('animate');
-                    counterElem.innerText = newValue;
-                }, 200); // 200ms to czas trwania animacji
+                }, 300);
             }
 
+            // Funkcja aktualizacji licznika i wywołania animacji
             window.updateCounter = function(index, action) {
                 countersRef.get().then((doc) => {
                     if (doc.exists) {
@@ -114,7 +116,9 @@
                         } else if (action === 'decrement') {
                             counters[`counter${index}`] -= 10;
                         }
-                        countersRef.set(counters);
+                        countersRef.set(counters).then(() => {
+                            animateCounter(index); // Animacja po zaktualizowaniu
+                        });
                     }
                 });
             };
