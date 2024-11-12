@@ -122,6 +122,14 @@
                 }, 300);
             }
 
+
+firebase.auth().signInAnonymously()
+  .then(() => {
+    console.log("Zalogowano anonimowo");
+  })
+  .catch((error) => {
+    console.error("Błąd logowania:", error);
+  });
             // Funkcja aktualizacji licznika i wywołania animacji
             window.updateCounter = function(index, action) {
                 countersRef.get().then((doc) => {
