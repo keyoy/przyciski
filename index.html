@@ -6,15 +6,13 @@
     <title>Strona z Polami i Przyciskami</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDK dla przeglądarki (w wersji 8.x.x) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <style>
         body {
             font-family: 'Rubik', sans-serif;
-            background-color: rgba(255, 255, 255, 0.0);
             text-align: center;
             margin-top: 50px;
         }
@@ -67,30 +65,28 @@
     <button class="reset-button" onclick="resetAll()">Reset</button>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Konfiguracja Firebase
-            const firebaseConfig = {
-                apiKey: "AIzaSyBz8dv3Fl4bBaxllSb_CzsSLBaKnSyxXU4",
-                authDomain: "przyciski.firebaseapp.com",
-                projectId: "przyciski",
-                storageBucket: "przyciski.appspot.com",
-                messagingSenderId: "25037736651",
-                appId: "1:25037736651:web:90fd96fd0ca9ec67ff694e"
-            };
+        // Konfiguracja Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBz8dv3Fl4bBaxllSb_CzsSLBaKnSyxXU4",
+            authDomain: "przyciski.firebaseapp.com",
+            projectId: "przyciski",
+            storageBucket: "przyciski.appspot.com",
+            messagingSenderId: "25037736651",
+            appId: "1:25037736651:web:90fd96fd0ca9ec67ff694e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        
+        const db = firebase.firestore();
+        const countersRef = db.collection('counters').doc('mainCounters');
+        let previousCounters = { counter1: 0, counter2: 0, counter3: 0 };
 
-            // Inicjalizacja Firebase
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
-            const countersRef = db.collection('counters').doc('mainCounters');
-
-            // Pobieranie danych z Firestore na początku
-            let previousCounters = { counter1: 0, counter2: 0, counter3: 0 };
-
+        firebase.auth().signInAnonymously().then(() => {
+            console.log("Zalogowano anonimowo");
+            
+            // Pobieranie danych z Firestore po zalogowaniu
             countersRef.onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
-
-                    // Sprawdzanie, które liczniki zostały zmienione i animowanie tylko tych
                     if (data.counter1 !== previousCounters.counter1) {
                         animateCounter(1);
                         document.getElementById('counter1').innerText = data.counter1;
@@ -103,58 +99,38 @@
                         animateCounter(3);
                         document.getElementById('counter3').innerText = data.counter3;
                     }
-
-                    // Aktualizacja poprzednich wartości liczników
                     previousCounters = { ...data };
-                } else {
-                    console.log("Brak danych");
                 }
             });
-
-            // Funkcja do animacji konkretnego licznika
-            function animateCounter(index) {
-                const counterElem = document.getElementById(`counter${index}`);
-                counterElem.classList.add('animate');
-
-                // Usunięcie animacji po 0.3s
-                setTimeout(() => {
-                    counterElem.classList.remove('animate');
-                }, 300);
-            }
-
-
-firebase.auth().signInAnonymously()
-  .then(() => {
-    console.log("Zalogowano anonimowo");
-  })
-  .catch((error) => {
-    console.error("Błąd logowania:", error);
-  });
-            // Funkcja aktualizacji licznika i wywołania animacji
-            window.updateCounter = function(index, action) {
-                countersRef.get().then((doc) => {
-                    if (doc.exists) {
-                        let counters = doc.data();
-                        if (action === 'increment') {
-                            counters[`counter${index}`] += 10;
-                        } else if (action === 'decrement') {
-                            counters[`counter${index}`] -= 10;
-                        }
-                        countersRef.set(counters).then(() => {
-                            animateCounter(index); // Animacja po zaktualizowaniu lokalnym
-                        });
-                    }
-                });
-            };
-
-            window.resetAll = function() {
-                countersRef.set({
-                    counter1: 0,
-                    counter2: 0,
-                    counter3: 0
-                });
-            };
+        }).catch((error) => {
+            console.error("Błąd logowania:", error);
         });
+
+        function animateCounter(index) {
+            const counterElem = document.getElementById(`counter${index}`);
+            counterElem.classList.add('animate');
+            setTimeout(() => {
+                counterElem.classList.remove('animate');
+            }, 300);
+        }
+
+        window.updateCounter = function(index, action) {
+            countersRef.get().then((doc) => {
+                if (doc.exists) {
+                    let counters = doc.data();
+                    if (action === 'increment') {
+                        counters[`counter${index}`] += 10;
+                    } else if (action === 'decrement') {
+                        counters[`counter${index}`] -= 10;
+                    }
+                    countersRef.set(counters);
+                }
+            });
+        };
+
+        window.resetAll = function() {
+            countersRef.set({ counter1: 0, counter2: 0, counter3: 0 });
+        };
     </script>
 </body>
 </html>
